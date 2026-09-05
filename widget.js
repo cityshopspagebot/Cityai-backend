@@ -44,8 +44,8 @@ var css = ""+
 "@keyframes caiB{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}"+
 ".cai-chips{display:flex;flex-wrap:wrap;gap:8px;padding:6px 20px 14px;flex-shrink:0;background:#17171B}"+
 ".cai-chip{background:rgba(255,217,0,.08);border:1.5px solid #FFD900;color:#FFD900;font:inherit;"+
-"font-size:13.5px;font-weight:600;padding:10px 18px;border-radius:40px;cursor:pointer;transition:.15s;"+
-"box-shadow:0 0 0 0 rgba(255,217,0,0)}"+
+"font-size:13.5px;font-weight:600;padding:10px 20px 10px 22px;border-radius:40px;cursor:pointer;"+
+"transition:.15s;box-shadow:0 0 0 0 rgba(255,217,0,0);white-space:nowrap;letter-spacing:.1px}"+
 ".cai-chip:hover{background:#FFD900;border-color:#FFD900;color:#000;"+
 "box-shadow:0 2px 12px rgba(255,217,0,.35)}"+
 ".cai-chip.cai-go{background:#FFD900;border-color:#FFD900;color:#000;font-weight:700}"+
