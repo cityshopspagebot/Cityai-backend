@@ -2,9 +2,11 @@
 CityAI backend — Citysearchpage sales assistant.
 
 Endpoints
-    GET  /health   liveness for Railway
-    POST /chat     conversation turn, proxied to an LLM
-    POST /lead     write a captured lead into the Airtable Leads table
+    GET  /health    liveness for Railway
+    GET  /widget.js the whole Carrd embed, served from here so the page
+                     only needs one <script src="..."> line
+    POST /chat      conversation turn, proxied to an LLM
+    POST /lead      write a captured lead into the Airtable Leads table
 
 Deploy on Railway. Set CORS_ORIGINS to the published CityAI Carrd URL.
 """
@@ -15,7 +17,7 @@ import json
 import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -143,6 +145,24 @@ class LeadIn(BaseModel):
     summary: Optional[str] = ""
     page: Optional[str] = ""
     source: Optional[str] = "CityAI"
+
+
+_WIDGET_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "widget.js")
+
+
+@app.get("/widget.js")
+def widget_js():
+    try:
+        with open(_WIDGET_PATH, "r", encoding="utf-8") as f:
+            body = f.read()
+    except FileNotFoundError:
+        return Response("console.error('CityAI widget.js missing on server');",
+                         media_type="application/javascript", status_code=500)
+    return Response(
+        body,
+        media_type="application/javascript",
+        headers={"Cache-Control": "public, max-age=300"},  # 5 min, so copy edits show up fast
+    )
 
 
 @app.get("/health")
