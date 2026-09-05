@@ -102,8 +102,9 @@ Hindi, Gujarati or Arabic."""
 SYSTEM_PROMPT = os.environ.get("WIDGET_SYSTEM_PROMPT") or DEFAULT_SYSTEM_PROMPT
 
 LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
-LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "https://api.openai.com/v1").rstrip("/")
-LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4o-mini")
+LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "https://api.anthropic.com/v1").rstrip("/")
+LLM_MODEL = os.environ.get("LLM_MODEL", "claude-sonnet-4-5")
+ANTHROPIC_VERSION = "2023-06-01"
 
 _origins = os.environ.get("CORS_ORIGINS", "*")
 ORIGINS = ["*"] if _origins.strip() == "*" else [
@@ -158,21 +159,35 @@ async def chat(body: ChatIn):
     if not LLM_API_KEY:
         return JSONResponse({"error": "LLM_API_KEY not configured"}, status_code=503)
 
-    # Keep the tail of the conversation; the system prompt carries the rules.
-    history = [{"role": m.role, "content": m.content} for m in body.messages][-20:]
+    # Anthropic's Messages API: system prompt is a top-level field, not a
+    # "system" role inside messages, and roles must alternate user/assistant
+    # with no adjacent same-role turns. Coalesce anything that violates that
+    # (e.g. two "bot" turns in a row from the widget) rather than 400ing.
+    history = []
+    for m in body.messages[-20:]:
+        role = "assistant" if m.role in ("assistant", "bot") else "user"
+        if history and history[-1]["role"] == role:
+            history[-1]["content"] += "\n" + m.content
+        else:
+            history.append({"role": role, "content": m.content})
+    if not history or history[0]["role"] != "user":
+        history.insert(0, {"role": "user", "content": "Hello"})
+
     payload = {
         "model": LLM_MODEL,
-        "messages": [{"role": "system", "content": SYSTEM_PROMPT}] + history,
-        "temperature": 0.6,
+        "system": SYSTEM_PROMPT,
+        "messages": history,
         "max_tokens": 600,
+        "temperature": 0.6,
     }
 
     try:
         async with httpx.AsyncClient(timeout=45) as client:
             r = await client.post(
-                LLM_BASE_URL + "/chat/completions",
+                LLM_BASE_URL + "/messages",
                 headers={
-                    "Authorization": "Bearer %s" % LLM_API_KEY,
+                    "x-api-key": LLM_API_KEY,
+                    "anthropic-version": ANTHROPIC_VERSION,
                     "Content-Type": "application/json",
                 },
                 json=payload,
@@ -190,8 +205,9 @@ async def chat(body: ChatIn):
         )
 
     data = r.json()
-    reply = (
-        data.get("choices", [{}])[0].get("message", {}).get("content", "") or ""
+    blocks = data.get("content") or []
+    reply = "".join(
+        b.get("text", "") for b in blocks if isinstance(b, dict) and b.get("type") == "text"
     ).strip()
 
     captured = "LEAD_CAPTURED" in reply
