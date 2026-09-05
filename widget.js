@@ -16,12 +16,13 @@ var WA = "https://wa.me/971503602149";
 var SITE = "https://citysearchpage.in";
 
 var css = ""+
-/* :where(*) keeps this reset at zero specificity so it can never out-rank the
-   real component rules below (a bare "#cai-panel *" is an ID-level selector
-   and was silently beating every .cai-chip/.cai-b/etc. padding declaration —
-   that's why chip padding kept computing to 0px no matter what we set it to). */
+/* The whole descendant selector must be inside :where() — wrapping only the
+   "*" and leaving #cai-panel outside still carries the ID's specificity (1,0,0),
+   which is why the first attempt at this fix still computed padding as 0px.
+   :where(#cai-panel *) has zero specificity end-to-end, so every class-level
+   component rule below (.cai-chip, .cai-b, .cai-card, etc.) now wins as intended. */
 "#cai-panel{box-sizing:border-box;margin:0;padding:0}"+
-"#cai-panel :where(*){box-sizing:border-box;margin:0;padding:0}"+
+":where(#cai-panel *){box-sizing:border-box;margin:0;padding:0}"+
 "#cai-panel{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;"+
 "width:100%;max-width:940px;margin:0 auto;height:560px;background:#17171B;border:1px solid #2A2A31;"+
 "border-radius:20px;display:flex;flex-direction:column;overflow:hidden;text-align:left;"+
