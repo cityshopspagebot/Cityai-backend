@@ -24,9 +24,9 @@ var css = ""+
 "@media(max-width:700px){#cai-panel{height:74vh;min-height:460px;border-radius:16px}}"+
 ".cai-hd{display:flex;align-items:center;gap:12px;padding:16px 20px;flex-shrink:0;"+
 "background:#1C1C22;border-bottom:1px solid #2A2A31}"+
-".cai-av{width:40px;height:40px;border-radius:12px;background:#FFD900;color:#000;"+
+".cai-av{width:52px;height:52px;border-radius:14px;background:#FFD900;color:#000;"+
 "display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;"+
-"font-family:Sora,sans-serif;font-weight:700;font-size:13px}"+
+"font-family:Sora,sans-serif;font-weight:700;font-size:15px}"+
 ".cai-av img{width:100%;height:100%;object-fit:cover}"+
 ".cai-hd h4{font-family:Sora,sans-serif;font-size:15px;font-weight:600;color:#fff}"+
 ".cai-hd p{font-size:9.5px;color:#8A8A98;margin-top:3px;text-transform:uppercase;letter-spacing:2px}"+
