@@ -16,7 +16,12 @@ var WA = "https://wa.me/971503602149";
 var SITE = "https://citysearchpage.in";
 
 var css = ""+
-"#cai-panel,#cai-panel *{box-sizing:border-box;margin:0;padding:0}"+
+/* :where(*) keeps this reset at zero specificity so it can never out-rank the
+   real component rules below (a bare "#cai-panel *" is an ID-level selector
+   and was silently beating every .cai-chip/.cai-b/etc. padding declaration —
+   that's why chip padding kept computing to 0px no matter what we set it to). */
+"#cai-panel{box-sizing:border-box;margin:0;padding:0}"+
+"#cai-panel :where(*){box-sizing:border-box;margin:0;padding:0}"+
 "#cai-panel{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;"+
 "width:100%;max-width:940px;margin:0 auto;height:560px;background:#17171B;border:1px solid #2A2A31;"+
 "border-radius:20px;display:flex;flex-direction:column;overflow:hidden;text-align:left;"+
@@ -223,9 +228,9 @@ bot("Hello 👋 I'm <b>CityAI</b>, from Citysearchpage.\n\nWe help local shops g
 setTimeout(function(){
   bot("So I point you the right way — which of these is you?");
   setChips([
-    {t:"I own a shop", fn:function(){ seg="Shop owner"; send("I own a shop and want to know more."); }},
-    {t:"I run a brand or chain", fn:function(){ seg="Brand / Chain"; send("I run a brand or multi-branch chain."); }},
-    {t:"I'm just looking", fn:function(){ seg="Just exploring"; send("I'm just browsing for now."); }}
+    {t:"👉 I own a shop", fn:function(){ seg="Shop owner"; send("I own a shop and want to know more."); }},
+    {t:"👉 I run a brand or chain", fn:function(){ seg="Brand / Chain"; send("I run a brand or multi-branch chain."); }},
+    {t:"👉 I'm just looking", fn:function(){ seg="Just exploring"; send("I'm just browsing for now."); }}
   ]);
 }, 500);
 })();
