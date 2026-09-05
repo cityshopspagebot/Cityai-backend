@@ -161,7 +161,10 @@ def widget_js():
     return Response(
         body,
         media_type="application/javascript",
-        headers={"Cache-Control": "public, max-age=300"},  # 5 min, so copy edits show up fast
+        # Short while CityAI is under active iteration — a stale cache here
+        # means a visitor sees old copy/behaviour with no way to force-refresh
+        # a third-party embed. Raise this back up once changes settle down.
+        headers={"Cache-Control": "public, max-age=15"},
     )
 
 
